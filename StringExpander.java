@@ -1,55 +1,73 @@
+/***Given a string containing characters followed by digits, expand each
+character by repeating it according to the digit that follows.
+ */
 import java.util.Scanner;
 
 public class StringExpander {
-
+    
     public static String expandString(String s) {
-        // Use StringBuilder for efficient string manipulation
         StringBuilder result = new StringBuilder();
-        
-        // Index to traverse through the string
         int i = 0;
-        
-        // Traverse the input string
+
+        Constant constant = new Constant();
+        System.out.println(constant.input);
+
         while (i < s.length()) {
-            // Get the current character
             char currentChar = s.charAt(i);
-            i++;  // Move to the next character which should be a digit
-            
-            // Initialize a variable to hold the number of repetitions
+            i++;
             int repeatCount = 0;
-            
-            // Read the digit(s) following the character
+
             while (i < s.length() && Character.isDigit(s.charAt(i))) {
                 repeatCount = repeatCount * 10 + (s.charAt(i) - '0');
                 i++;
             }
-            
-            // Append the repeated character to the result
+
             for (int j = 0; j < repeatCount; j++) {
                 result.append(currentChar);
             }
         }
-        
-        // Convert StringBuilder to String and return
+
         return result.toString();
     }
 
+    public static boolean isValidString(String s) {
+        for (int i = 0; i < s.length(); i++) {
+            if (i % 2 == 0) {
+                // Check if the character is a letter
+                if (!Character.isLetter(s.charAt(i))) {
+                    return false;
+                }
+            } else {
+                // Check if the character is a digit
+                if (!Character.isDigit(s.charAt(i))) {
+                    return false;
+                }
+            }
+        }
+        return s.length() % 2 == 0; // Ensure the string has an even length
+    }
+
     public static void main(String[] args) {
-        // Create a Scanner object for user input
         Scanner scanner = new Scanner(System.in);
-        
-        // Prompt the user for input
-        System.out.println("Enter a string with characters followed by digits (e.g., 'a1b4c3'):");
-        String input = scanner.nextLine();
-        
-        // Close the scanner
+        String userInput;
+        Constant constant = new Constant();
+
+        do {
+            System.out.print(constant.ENTER_STRING);
+            userInput = scanner.nextLine();
+
+            if (!userInput.equalsIgnoreCase("exit")) {
+                if (isValidString(userInput)) {
+                    String expanded = expandString(userInput);
+                    System.out.println("Expanded string: " + expanded);
+                } else {
+                    System.out.println("This is an incorrect string ");
+                    System.out.println("Enter correct string (eg: a2s3f5g)");
+                }
+            }
+        } while (!userInput.equalsIgnoreCase("exit"));
+
+        System.out.println("Exiting the program...");
         scanner.close();
-        
-        // Expand the string
-        String expandedString = expandString(input);
-        
-        // Output the result
-        System.out.println("Expanded string:");
-        System.out.println(expandedString);
     }
 }
