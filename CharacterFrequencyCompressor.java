@@ -1,3 +1,6 @@
+/*** Write a Java program that takes a string input and outputs the frequency of
+each character in a compressed form.
+*/
 import java.util.Scanner;
 
 public class CharacterFrequencyCompressor {
