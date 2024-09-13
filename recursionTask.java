@@ -95,13 +95,7 @@ public class recursionTask {
     // Method stubs for incomplete tasks
     private static int uniquePalindromeCount = 0;
     private static boolean[] isPalindromeUnique;
-
-    public static int getUniquePalindromeCount(String inputString) {
-        isPalindromeUnique = new boolean[inputString.length() * (inputString.length() + 1) / 2];
-        uniquePalindromeCount = 0;
-        palindromeCombinations(inputString, 0, inputString.length() - 1);
-        return uniquePalindromeCount;
-    }
+    private static final int MAX_INPUT_LENGTH = 25;
 
     private static void palindromeCombinations(String inputString, int startIndex, int endIndex) {
         if (startIndex > endIndex) {
@@ -123,8 +117,7 @@ public class recursionTask {
 
     private static int calculateUniqueIndex(String substring, String inputString) {
         int length = substring.length();
-        return (inputString.length() - length) * (inputString.length() - length + 1) / 2
-                + inputString.indexOf(substring);
+        return (inputString.length() - length) * (inputString.length() - length + 1) / 2 + inputString.indexOf(substring);
     }
 
     private static boolean isPalindrome(String inputString) {
@@ -140,8 +133,9 @@ public class recursionTask {
     }
 
     // Tail recursion method for better time complexity.
-    //and we can also use array to store the value and then print the fibonacci sequence
-    //like(return[intput] = fibonacci[n -1] + fibonacci[n -2];)
+    // and we can also use array to store the value and then print the fibonacci
+    // sequence
+    // like(return[intput] = fibonacci[n -1] + fibonacci[n -2];)
     private static BigInteger fibonacciTail(int index, BigInteger prev, BigInteger current) {
         if (index == 0) {
             return prev;
@@ -149,13 +143,43 @@ public class recursionTask {
         return fibonacciTail(index - 1, current, prev.add(current));
     }
 
-    public static BigInteger fibonacci(int n) {
-        return fibonacciTail(n, BigInteger.ZERO, BigInteger.ONE);
+    public static String fibonacci(int n) {
+        BigInteger result = fibonacciTail(n, BigInteger.ZERO, BigInteger.ONE);
+        String resultStr = result.toString();
+        if (resultStr.length() > 12) {
+            resultStr = resultStr.substring(0, 12);
+            return resultStr;
+        }
+        return resultStr;
     }
 
     // Task 3: SnakeToCamel
     public static String convertString(String input) {
+        if (isCamelCase(input, 0, false)) {
+            return input;
+        }
         return convertToCamel(input, 0, "", true, true);
+    }
+
+    private static boolean isCamelCase(String input, int index, boolean foundUpper) {
+        if (index >= input.length()) {
+            return true;
+        }
+
+        char currentChar = input.charAt(index);
+
+        if (Character.isUpperCase(currentChar)) {
+            foundUpper = true;
+        }
+
+        if (foundUpper && (currentChar == ' ' || currentChar == '!' || currentChar == '@' || currentChar == '#' ||
+                currentChar == '$' || currentChar == '%' || currentChar == '^' || currentChar == '&' ||
+                currentChar == '*' || currentChar == '-' || currentChar == '_' || currentChar == '=' ||
+                currentChar == '+')) {
+            return false;
+        }
+
+        return isCamelCase(input, index + 1, foundUpper);
     }
 
     private static String convertToCamel(String input, int index, String result, boolean capitalizeNext,
@@ -218,16 +242,33 @@ public class recursionTask {
     public static double getDecimal(String binaryStr) {
         if (binaryStr.contains(".")) {
             String[] parts = binaryStr.split("\\.");
-            long integerPart = Long.parseLong(parts[0]);
+            double integerPart = getBinaryDecimal(parts[0], 0);
             double fractionalPart = getBinaryDecimalFractional(parts[1], 1);
-            return getBinaryDecimal(integerPart, 0) + fractionalPart;
+            return integerPart + fractionalPart;
         } else {
-            long binary = Long.parseLong(binaryStr);
-            return getBinaryDecimal(binary, 0);
+            return getBinaryDecimal(binaryStr, 0);
         }
     }
 
-    private static int power(int base, int exponent) {
+    private static double getBinaryDecimal(String binary, int exponent) {
+        if (binary.isEmpty()) {
+            return 0;
+        }
+        char lastChar = binary.charAt(binary.length() - 1);
+        double lastDigit = lastChar - '0';
+        return (lastDigit * power(2, exponent))
+                + getBinaryDecimal(binary.substring(0, binary.length() - 1), exponent + 1);
+    }
+
+    private static double getBinaryDecimalFractional(String fractionalBinary, int exponent) {
+        if (fractionalBinary.isEmpty()) {
+            return 0.0;
+        }
+        double temp = fractionalBinary.charAt(0) - '0';
+        return (temp / power(2, exponent)) + getBinaryDecimalFractional(fractionalBinary.substring(1), exponent + 1);
+    }
+
+    private static long power(int base, int exponent) {
         if (exponent == 0) {
             return 1;
         }
@@ -242,13 +283,14 @@ public class recursionTask {
         return (temp * power(2, exponent)) + getBinaryDecimal(binary / 10, exponent + 1);
     }
 
-    private static double getBinaryDecimalFractional(String fractionalBinary, int exponent) {
+    private static double getBinaryDecimalFractional(String fractionalBinary, long exponent) {
         if (fractionalBinary.isEmpty()) {
             return 0.0;
         }
         double temp = fractionalBinary.charAt(0) - '0';
         return (temp / power(2, exponent)) + getBinaryDecimalFractional(fractionalBinary.substring(1), exponent + 1);
     }
+   
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -261,46 +303,47 @@ public class recursionTask {
             switch (choice) {
                 case 1:
                     do {
-                        System.out.print(constant.countPalindrome);
+                        System.out.print("Enter a string: ");
                         String inputString = scanner.nextLine();
+                        
+                        if (inputString.length() > MAX_INPUT_LENGTH) {
+                            System.out.println("Invalid input");
+                            return;
+                        }
+                        isPalindromeUnique = new boolean[inputString.length() * (inputString.length() + 1) / 2];
+                        palindromeCombinations(inputString, 0, inputString.length() - 1);
+                        System.out.println("Number of unique palindromic combinations: " + uniquePalindromeCount);
 
-                        int uniquePalindromeCount = getUniquePalindromeCount(inputString);
-
-                        System.out.println(constant.countPalindromeResult + uniquePalindromeCount);
-                        scanner.nextLine();
                         System.out.print(constant.promptwagin);
                     } while (scanner.nextLine().equalsIgnoreCase("yes"));
                     break;
 
                 case 2:
                     do {
-                        System.out.print(constant.indexValue);
+                        System.out.println(constant.indexValue);
                         String input = scanner.nextLine();
-
-                        try {
+                        
+                         try {
                             int n = Integer.parseInt(input);
                             if (n < 0) {
-                                System.out.println(constant.invalid_input);
-                            } else {
-                                System.out.println(constant.fibonacciResult + n + " is: " + fibonacci(n));
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println(constant.invalid_input);
-                        }
-                        System.out.print(constant.promptwagin);
-                    } while (scanner.nextLine().equalsIgnoreCase("yes"));
-                    break;
+                                 System.out.println(constant.invalid_input);
+                                } else {
+                                    System.out.println(constant.fibonacciResult + n + " is: " + fibonacci(n));
+                                }
+                                 } catch (NumberFormatException e) {
+                                    System.out.println(constant.invalid_input);
+                                }
+                                System.out.print(constant.promptwagin); 
+                            } while (scanner.nextLine().equalsIgnoreCase("yes"));
+                            break;
 
                 case 3:
                     do {
                         System.out.println(constant.snakeCase);
                         String input = scanner.nextLine();
-                        if (input.isEmpty() || Character.isDigit(input.charAt(0))) {
-                            System.out.println(constant.invalid_input);
-                        } else {
-                            System.out.println(constant.convertedResult + convertString(input));
-                        }
-                        System.out.print(constant.promptwagin);
+                        String result = convertString(input);
+                        System.out.println(constant.convertedResult + result);
+                        System.out.print(constant.promptwagin); 
                     } while (scanner.nextLine().equalsIgnoreCase("yes"));
                     break;
 
@@ -320,7 +363,6 @@ public class recursionTask {
                     do {
                         System.out.print(constant.binaryinput);
                         String binaryInputStr = scanner.nextLine();
-
                         if (binaryInputStr.isEmpty() || !isBinary(binaryInputStr, 0)) {
                             System.out.println(constant.invalid_input);
                         } else {
@@ -345,9 +387,9 @@ public class recursionTask {
                     System.out.println(constant.invalid_choice);
                     break;
             }
-        } while (choice != 6);
+        }while(choice!=6);
 
-        scanner.close();
-    }
+    scanner.close();
+}
 
 }
